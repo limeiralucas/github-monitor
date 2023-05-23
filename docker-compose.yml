@@ -9,6 +9,7 @@ services:
 
   api:
     build: .
+    image: github-monitor_api:latest
     ports:
       - "8000:8000"
     volumes:
@@ -19,6 +20,7 @@ services:
       - redis
 
   worker:
+    build: .
     image: github-monitor_api:latest
     command: celery worker --app=githubmonitor --loglevel=info
     volumes:
