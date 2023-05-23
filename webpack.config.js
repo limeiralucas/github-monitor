@@ -9,6 +9,7 @@ module.exports = {
   output: {
     path: path.resolve('./assets/bundles/'),
     filename: '[name]-[hash].js',
+    hashFunction: 'sha256'
   },
 
   plugins: [
