@@ -7,6 +7,12 @@ from github.PaginatedList import PaginatedList
 from github.Repository import Repository
 
 
+class InvalidRequestUserException(Exception):
+    """Represent an exception when a invalid user is provided to client creation."""
+    def __init__(self) -> None:
+        super().__init__("Request user is invalid or doesn't contain github credentials.")
+
+
 class GithubAPIClient:
     """Class responsible for all actions related to Github."""
     def __init__(self, access_token: str) -> None:
@@ -48,7 +54,18 @@ class GithubAPIClient:
 
     @classmethod
     def from_request_user(cls, request_user: Any) -> "GithubAPIClient":
-        social = request_user.social_auth.get(provider='github')
-        access_token = social.extra_data['access_token']
+        """Create a GithubAPIClient from a provided Django request user.
 
-        return cls(access_token)
+        :param request_user: Django request user
+        :type request_user: Any
+        :raises InvalidRequestUserException: User invalid/doesn't contain credentials
+        :return: client created with the request user github access token
+        :rtype: GithubAPIClient
+        """
+        try:
+            social = request_user.social_auth.get(provider='github')
+            access_token = social.extra_data['access_token']
+
+            return cls(access_token)
+        except Exception as e:
+            raise InvalidRequestUserException() from e
