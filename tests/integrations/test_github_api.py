@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from github.GithubException import UnknownObjectException
 
-from integrations.github_api import (GithubAPIClient,
-                                     RepositoryNotFoundException)
+from integrations.github_api import GithubAPIClient
 
 
 class TestGithubAPIClient(TestCase):
@@ -37,5 +36,5 @@ class TestGithubAPIClient(TestCase):
     def test_get_repository_not_found(self, get_repo_mock):
         repository_name = 'user/repo'
 
-        with self.assertRaises(RepositoryNotFoundException):
+        with self.assertRaises(UnknownObjectException):
             self.gh_client.get_repository(repository_name)
