@@ -38,6 +38,7 @@ class GithubAPIClient:
         :type repo_full_name: str
         :param since: Date to fetch commits between it and now, defaults to None
         :type since: Optional[datetime], optional
+        :raises BadCredentialsException: Raised if invalid credentials were provided to client
         :return: PaginatedList object (iterable) to access the commits from the repository
         :rtype: PaginatedList[Commit]
         """
