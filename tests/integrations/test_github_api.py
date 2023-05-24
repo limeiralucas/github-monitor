@@ -2,8 +2,6 @@ from datetime import datetime
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from integrations.github_api import GithubAPIClient
 
 
@@ -13,12 +11,27 @@ class TestGithubAPIClient(TestCase):
         self.gh_client = GithubAPIClient(self.access_token)
 
     @patch('integrations.github_api.Github')
-    def test_client_initialization(self, GithubClientMock):
+    def test_client_initialization(self, github_client_mock):
         access_token = 'token'
         client = GithubAPIClient(access_token)
 
         assert client
-        GithubClientMock.assert_called_once_with(access_token)
+        github_client_mock.assert_called_once_with(access_token)
+
+    @patch('integrations.github_api.Github')
+    def test_from_request_user(self, github_client_mock):
+        access_token = 'token'
+
+        request_user = MagicMock()
+        social_mock = request_user.social_auth.get.return_value
+        social_mock.extra_data = {"access_token": access_token}
+        request_user.social_auth.get_return_value = social_mock
+
+        client = GithubAPIClient.from_request_user(request_user)
+
+        assert client
+        github_client_mock.assert_called_once_with(access_token)
+        request_user.social_auth.get.assert_called_once_with(provider="github")
 
     @patch('github.Github.get_repo')
     def test_get_repository(self, get_repo_mock):

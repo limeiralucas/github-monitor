@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from github import Github
 from github.Commit import Commit
@@ -45,3 +45,10 @@ class GithubAPIClient:
         repo = self.get_repository(repo_full_name)
 
         return repo.get_commits(since=since)
+
+    @classmethod
+    def from_request_user(cls, request_user: Any) -> "GithubAPIClient":
+        social = request_user.social_auth.get(provider='github')
+        access_token = social.extra_data['access_token']
+
+        return cls(access_token)
