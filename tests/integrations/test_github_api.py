@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -38,3 +39,29 @@ class TestGithubAPIClient(TestCase):
 
         with self.assertRaisesRegex(Exception, "Repository not found."):
             self.gh_client.get_repository(repository_name)
+
+    @patch('integrations.github_api.GithubAPIClient.get_repository')
+    def test_get_commits_from_repository(self, get_repository_mock):
+        repository_name = 'user/repo'
+
+        expected_commits = [MagicMock()] * 2
+
+        repo_mock = get_repository_mock.return_value
+        repo_mock.get_commits.return_value = expected_commits
+        get_repository_mock.return_value = repo_mock
+
+        commits = self.gh_client.get_commits_from_repository(repository_name)
+
+        repo_mock.get_commits.assert_called_once()
+        self.assertListEqual(commits, expected_commits)
+
+    @patch('integrations.github_api.GithubAPIClient.get_repository')
+    def test_get_commits_from_repository_since_date(self, get_repository_mock):
+        repository_name = 'user/repo'
+        since_date = datetime(2023, 1, 5)
+
+        repo_mock = get_repository_mock.return_value
+
+        self.gh_client.get_commits_from_repository(repository_name, since_date)
+
+        repo_mock.get_commits.assert_called_once_with(since=since_date)
