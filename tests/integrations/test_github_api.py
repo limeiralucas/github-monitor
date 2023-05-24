@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from github.GithubException import UnknownObjectException
+import pytest
 
 from integrations.github_api import GithubAPIClient
 
@@ -32,9 +32,9 @@ class TestGithubAPIClient(TestCase):
         get_repo_mock.assert_called_once_with(repository_name)
         assert repo == repo_mock
 
-    @patch('github.Github.get_repo', side_effect=UnknownObjectException(None, None, None))
-    def test_get_repository_not_found(self, get_repo_mock):
+    @patch('github.Github.get_repo', side_effect=Exception("Repository not found."))
+    def test_get_repository_exception_raised(self, get_repo_mock):
         repository_name = 'user/repo'
 
-        with self.assertRaises(UnknownObjectException):
+        with self.assertRaisesRegex(Exception, "Repository not found."):
             self.gh_client.get_repository(repository_name)
