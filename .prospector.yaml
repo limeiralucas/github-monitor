@@ -18,6 +18,8 @@ pylint:
   disable:
     - invalid-name
     - wrong-import-order
+    - too-few-public-methods
+    - django-not-configured
   options:
     max-line-length: 100
 
@@ -28,6 +30,7 @@ ignore-paths:
   - node_modules
   - venv
   - env
+  - tests
 
 ignore-patterns:
   - .+/migrations/.+
