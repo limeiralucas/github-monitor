@@ -1,7 +1,10 @@
 from github.GithubException import UnknownObjectException
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from integrations.github_api import GithubAPIClient
@@ -10,12 +13,24 @@ from .models import Commit
 from .serializers import CommitSerializer, RepositorySerializer
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def commit_list_view(request):
-    commits = Commit.objects.all()
-    serializer = CommitSerializer(commits, many=True)
-    return Response(serializer.data)
+class CommitsView(ListModelMixin, GenericAPIView):
+    """View for endpoitns related to Commits."""
+    queryset = Commit.objects.all()
+    serializer_class = CommitSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        """List all commits.
+
+        :param request: Request object.
+        :type request: Request
+        :return: Response object containing serialized data for all commits.
+        :rtype: Response
+        """
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data)
 
 
 @api_view(["POST"])
