@@ -32,11 +32,19 @@ class CommitsView(GenericAPIView):
 
 
 class RepositoriesView(GenericAPIView):
+    """View for endpoints related to Repositories."""
     queryset = Repository.objects.all()
     serializer_class = RepositorySerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
+        """Create a repository using provided data.
+
+        :param request: Request object.
+        :type request: Request
+        :return: Response object containg serialized data of created repository.
+        :rtype: Response
+        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
