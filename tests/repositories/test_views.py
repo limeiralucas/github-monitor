@@ -1,7 +1,9 @@
 import json
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase
+from github.GithubException import UnknownObjectException
 
 from repositories.models import Commit, Repository
 from repositories.serializers import CommitSerializer, RepositorySerializer
@@ -67,12 +69,16 @@ class TestRepositoriesView(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_repository_create(self):
+    @patch('integrations.github_api.GithubAPIClient.from_request_user')
+    def test_repository_create(self, from_request_user_mock):
         """Check if repository is created."""
+        repository_fullname = 'user/repo'
+        gh_client_mock = from_request_user_mock.return_value
+
         self.client.force_login(self.user)
         response = self.client.post(
             '/api/repositories/',
-            json.dumps({'name': 'user/repo'}),
+            json.dumps({'name': repository_fullname}),
             content_type='application/json',
             follow=True
         )
@@ -80,11 +86,12 @@ class TestRepositoriesView(TestCase):
         repository = Repository.objects.first()
         serializer = RepositorySerializer(repository)
 
+        gh_client_mock.get_repository.assert_called_once_with(repository_fullname)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, serializer.data)
 
     def test_repository_create_invalid_data(self):
-        """Check if repository returns 400 when invalid data is sent."""
+        """Check if it returns 400 when invalid data is sent."""
         self.client.force_login(self.user)
         response = self.client.post(
             '/api/repositories/',
@@ -94,6 +101,23 @@ class TestRepositoriesView(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    @patch('integrations.github_api.GithubAPIClient.from_request_user')
+    def test_repository_create_not_found(self, from_request_user_mock):
+        """Check if it returns 404 when the repository is not found on Github"""
+        gh_client_mock = from_request_user_mock.return_value
+        gh_client_mock.get_repository.side_effect = UnknownObjectException(None, None, None)
+        from_request_user_mock.return_value = gh_client_mock
+
+        self.client.force_login(self.user)
+        response = self.client.post(
+            '/api/repositories/',
+            json.dumps({'name': 'user/invalid-repo'}),
+            content_type='application/json',
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 404)
 
     def tearDown(self):
         self.user.delete()
