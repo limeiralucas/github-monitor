@@ -67,7 +67,7 @@ class TestRepositoriesView(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_commits_create(self):
+    def test_repository_create(self):
         """Check if repository is created."""
         self.client.force_login(self.user)
         response = self.client.post(
@@ -83,7 +83,7 @@ class TestRepositoriesView(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, serializer.data)
 
-    def test_commits_create_invalid_data(self):
+    def test_repository_create_invalid_data(self):
         """Check if repository returns 400 when invalid data is sent."""
         self.client.force_login(self.user)
         response = self.client.post(
