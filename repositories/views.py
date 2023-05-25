@@ -14,7 +14,7 @@ from .serializers import CommitSerializer, RepositorySerializer
 
 
 class CommitsView(ListModelMixin, GenericAPIView):
-    """View for endpoitns related to Commits."""
+    """View for endpoints related to Commits."""
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
     permission_classes = [IsAuthenticated]
