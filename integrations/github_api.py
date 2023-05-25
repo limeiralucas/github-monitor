@@ -16,41 +16,43 @@ class InvalidRequestUserException(Exception):
 class GithubAPIClient:
     """Class responsible for all actions related to Github."""
     def __init__(self, access_token: str) -> None:
+        self.access_token = access_token
         self.client = Github(access_token)
 
-    def get_repository(self, repo_full_name: str) -> Repository:
+    def get_repository(self, repo_fullname: str) -> Repository:
         """Fetch a repository from Github given a provided full name.
 
-        :param repo_full_name: Repository full name (owner/repository_name)
-        :type repo_full_name: str
+        :param repo_fullname: Repository full name (owner/repository_name)
+        :type repo_fullname: str
         :raises UnknownObjectException: Raised if a repository with the given name is not found
         :raises BadCredentialsException: Raised if invalid credentials were provided to client
         :return: Repository object
         :rtype: Repository
         """
 
-        return self.client.get_repo(repo_full_name)
+        return self.client.get_repo(repo_fullname)
 
     def get_commits_from_repository(
             self,
-            repo_full_name: str,
+            repo_fullname: str,
             since: Optional[datetime] = None
     ) -> "PaginatedList[Commit]":
         """
         Fetch commits from a Github repository given a provided full name.
         A date can be provided to fetch commits between now and this date.
 
-        :param repo_full_name: Repository full name (owner/repository_name)
-        :type repo_full_name: str
+        :param repofull_name: Repository full name (owner/repository_name)
+        :type repofull_name: str
         :param since: Date to fetch commits between it and now, defaults to None
         :type since: Optional[datetime], optional
         :raises BadCredentialsException: Raised if invalid credentials were provided to client
         :return: PaginatedList object (iterable) to access the commits from the repository
         :rtype: PaginatedList[Commit]
         """
-        repo = self.get_repository(repo_full_name)
+        repo = self.get_repository(repo_fullname)
 
-        return repo.get_commits(since=since)
+        args = {'since': since} if since else {}
+        return repo.get_commits(**args)
 
     @classmethod
     def from_request_user(cls, request_user: Any) -> "GithubAPIClient":
