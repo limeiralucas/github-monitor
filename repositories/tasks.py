@@ -1,23 +1,32 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
 from celery import shared_task
+from django.db import transaction
 
 from githubmonitor.celery import app  # noqa: F401
 from integrations.github_api import GithubAPIClient
 from repositories.adapters import CommitAdapter
+from repositories.models import Repository
 from repositories.serializers import CommitSerializer
 
 
 @shared_task
-def get_last_thirty_days_repo_commits(github_access_token: str, repository_fullname: str):
+def get_last_thirty_days_repo_commits(github_access_token: str, repository_id: int):
     gh_client = GithubAPIClient(github_access_token)
     last_thirty_days = datetime.now(tz=timezone.utc) - timedelta(days=30)
 
-    commits = gh_client.get_commits_from_repository(repository_fullname, since=last_thirty_days)
+    repository = Repository.objects.get(pk=repository_id)
 
-    all_commits = [CommitAdapter.from_data(commit.raw_data) for commit in commits]
-    serializer = CommitSerializer(data=all_commits, many=True)
+    commits = gh_client.get_commits_from_repository(repository.name, since=last_thirty_days)
 
-    serializer.is_valid(raise_exception=True)
+    commits_data_list = [CommitAdapter.from_data(commit.raw_data) for commit in commits]
+    logging.info("Retrieved %s commits from Github.", len(commits_data_list))
 
-    print(f"Fetched {len(all_commits)}")
+    with transaction.atomic():
+        for commit_data in commits_data_list:
+            serializer = CommitSerializer(data=commit_data)
+            serializer.is_valid(raise_exception=True)
+
+            serializer.validated_data['repository'] = repository
+            serializer.save()

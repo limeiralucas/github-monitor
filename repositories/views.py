@@ -58,8 +58,8 @@ class RepositoriesView(GenericAPIView):
         except UnknownObjectException:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer.save()
+        repository = serializer.save()
 
-        get_last_thirty_days_repo_commits.delay(gh_client.access_token, repo_fullname)
+        get_last_thirty_days_repo_commits.delay(gh_client.access_token, repository.id)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
