@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 from decouple import Csv, config
 from dj_database_url import parse as db_url
@@ -88,7 +89,9 @@ WSGI_APPLICATION = 'githubmonitor.wsgi.application'
 DATABASES = {
     'default': config('DATABASE_URL', cast=db_url)
 }
-
+if 'test' in sys.argv:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+    DATABASES['default']['NAME'] = 'databasename.db3'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
