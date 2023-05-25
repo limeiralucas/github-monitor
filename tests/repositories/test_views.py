@@ -1,11 +1,13 @@
+import json
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 from repositories.models import Commit, Repository
-from repositories.serializers import CommitSerializer
+from repositories.serializers import CommitSerializer, RepositorySerializer
 
 
-class TestCalls(TestCase):
+class TestCommitsView(TestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(username='test_user', password='test')
         self.repository = Repository.objects.create(name='Test Repository')
@@ -52,4 +54,46 @@ class TestCalls(TestCase):
             commit.delete()
 
         self.repository.delete()
+        self.user.delete()
+
+
+class TestRepositoriesView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser(username='test_user', password='test')
+
+    def test_repository_create_unauthenticated(self):
+        """Check if authentication is required to add repository."""
+        response = self.client.post('/api/repositories', follow=True)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_commits_create(self):
+        """Check if repository is created."""
+        self.client.force_login(self.user)
+        response = self.client.post(
+            '/api/repositories/',
+            json.dumps({'name': 'user/repo'}),
+            content_type='application/json',
+            follow=True
+        )
+
+        repository = Repository.objects.first()
+        serializer = RepositorySerializer(repository)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, serializer.data)
+
+    def test_commits_create_invalid_data(self):
+        """Check if repository returns 400 when invalid data is sent."""
+        self.client.force_login(self.user)
+        response = self.client.post(
+            '/api/repositories/',
+            json.dumps({}),
+            content_type='application/json',
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def tearDown(self):
         self.user.delete()
