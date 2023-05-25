@@ -52,3 +52,4 @@ class TestCalls(TestCase):
             commit.delete()
 
         self.repository.delete()
+        self.user.delete()
