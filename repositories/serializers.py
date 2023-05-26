@@ -11,6 +11,7 @@ class RepositorySerializer(serializers.ModelSerializer):
 
 class CommitSerializer(serializers.ModelSerializer):
     repository = serializers.StringRelatedField(many=False)
+    avatar = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Commit

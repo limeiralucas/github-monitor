@@ -17,7 +17,7 @@ class Commit(models.Model):
     author = models.CharField(max_length=50)
     url = models.URLField(max_length=200)
     date = models.DateTimeField()
-    avatar = models.URLField(max_length=200, blank=True)
+    avatar = models.URLField(max_length=200, blank=False, null=True)
 
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 

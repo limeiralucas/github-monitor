@@ -5,13 +5,26 @@ from typing import Any
 class BaseAdapter(ABC):
     """Base adapter class."""
     @staticmethod
-    def find(element, json):
-        """Find data inside json dict using json paths."""
-        keys = element.split('.')
-        rv = json
-        for key in keys:
-            rv = rv[key]
-        return rv
+    def find(path: str, data: dict, default: Any = None):
+        """Find a element inside data using a provided path.
+
+        :param element: Path to element.
+        :type element: str
+        :param data: Data to search into.
+        :type data: dict
+        :param default: Return if value is not found, defaults to None
+        :type default: Any, optional
+        :return: Value found on provided path.
+        :rtype: _type_
+        """
+        keys = path.split('.')
+        rv = data
+        try:
+            for key in keys:
+                rv = rv[key]
+            return rv
+        except TypeError:
+            return default
 
     @classmethod
     @abstractmethod

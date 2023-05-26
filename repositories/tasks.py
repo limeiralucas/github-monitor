@@ -25,6 +25,7 @@ def get_last_30_days_repo_commits(github_access_token: str, repository_id: int):
 
     repository = Repository.objects.get(pk=repository_id)
 
+    logging.info("Fetching commits for %s since: %s", repository.name, last_thirty_days)
     commits = gh_client.get_commits_from_repository(repository.name, since=last_thirty_days)
 
     commits_data_list = [CommitAdapter.from_data(commit.raw_data) for commit in commits]
