@@ -21,6 +21,9 @@ class TestTasks(TestCase):
                         "date": "2023-04-14T16:00:49Z",
                     },
                 },
+                "author": {
+                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+                },
                 "url": "https://api.github.com/repos/user/repo/commits/12345",
                 "sha": "12345",
             },
@@ -31,6 +34,9 @@ class TestTasks(TestCase):
                         "name": "Jane Green",
                         "date": "2023-04-16T12:00:49Z",
                     },
+                },
+                "author": {
+                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
                 },
                 "url": "https://api.github.com/repos/user/repo/commits/67890",
                 "sha": "67890",
@@ -66,4 +72,5 @@ class TestTasks(TestCase):
             self.assertEqual(commit.sha, commit_data['sha'])
             self.assertEqual(commit.author, commit_data['author'])
             self.assertEqual(commit.url, commit_data['url'])
+            self.assertEqual(commit.avatar, commit_data['avatar'])
             self.assertEqual(commit.repository, self.repository)

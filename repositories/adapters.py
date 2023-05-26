@@ -35,7 +35,8 @@ class CommitAdapter(BaseAdapter):
             "sha": "sha",
             "author": "commit.author.name",
             "url": "url",
-            "date": "commit.author.date"
+            "date": "commit.author.date",
+            "avatar": "author.avatar_url"
         }
 
         return {key: cls.find(path, data) for key, path in fields.items()}
