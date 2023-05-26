@@ -69,11 +69,14 @@ class TestRepositoriesView(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    @patch('repositories.tasks.get_last_30_days_repo_commits.delay')
     @patch('integrations.github_api.GithubAPIClient.from_request_user')
-    def test_repository_create(self, from_request_user_mock):
-        """Check if repository is created."""
+    def test_repository_create(self, from_request_user_mock, get_commits_task_mock):
+        """Check if repository is created and celery task to fetch commits is setup."""
+        access_token = 'access-token'
         repository_fullname = 'user/repo'
         gh_client_mock = from_request_user_mock.return_value
+        gh_client_mock.access_token = access_token
 
         self.client.force_login(self.user)
         response = self.client.post(
@@ -87,6 +90,7 @@ class TestRepositoriesView(TestCase):
         serializer = RepositorySerializer(repository)
 
         gh_client_mock.get_repository.assert_called_once_with(repository_fullname)
+        get_commits_task_mock.assert_called_once_with(access_token, repository.id)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, serializer.data)
 

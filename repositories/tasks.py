@@ -12,7 +12,14 @@ from repositories.serializers import CommitSerializer
 
 
 @shared_task
-def get_last_thirty_days_repo_commits(github_access_token: str, repository_id: int):
+def get_last_30_days_repo_commits(github_access_token: str, repository_id: int):
+    """Fetch last 30 days commits of a repository and save them to database.
+
+    :param github_access_token: Github access token.
+    :type github_access_token: str
+    :param repository_id: Repository id (pk) from database.
+    :type repository_id: int
+    """
     gh_client = GithubAPIClient(github_access_token)
     last_thirty_days = datetime.now(tz=timezone.utc) - timedelta(days=30)
 

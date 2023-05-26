@@ -9,7 +9,7 @@ from integrations.github_api import GithubAPIClient
 
 from .models import Commit, Repository
 from .serializers import CommitSerializer, RepositorySerializer
-from .tasks import get_last_thirty_days_repo_commits
+from .tasks import get_last_30_days_repo_commits
 
 
 class CommitsView(GenericAPIView):
@@ -60,6 +60,6 @@ class RepositoriesView(GenericAPIView):
 
         repository = serializer.save()
 
-        get_last_thirty_days_repo_commits.delay(gh_client.access_token, repository.id)
+        get_last_30_days_repo_commits.delay(gh_client.access_token, repository.id)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

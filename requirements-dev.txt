@@ -1,2 +1,4 @@
 -r requirements.txt
+freezegun==1.2.2
 pre_commit==3.3.2
+prospector==1.10.2
