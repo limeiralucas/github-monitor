@@ -19,6 +19,15 @@ class TestCommitsView(TestCase):
 
     @staticmethod
     def create_random_commits(number_commits: int, repository: Repository) -> List[Commit]:
+        """Create random commits on db given a provided number and repository.
+
+        :param number_commits: Number of commits to be created.
+        :type number_commits: int
+        :param repository: Repository to associate with the commits.
+        :type repository: Repository
+        :return: List of created commits.
+        :rtype: List[Commit]
+        """
         return [
             Commit.objects.create(
                 message=f'Commit {i}',
@@ -54,7 +63,11 @@ class TestCommitsView(TestCase):
         self.assertIsNone(response.data["previous"])
 
     def test_commits_list_pagination(self):
-        """Check if the requested commits are returned with pagination."""
+        """Check if the requested commits are returned with pagination.
+
+        Check if the first page contains the first 10 commits.
+        Check if the second page contains the second 10 commits.
+        """
         # Check first page
         self.client.force_login(self.user)
         response = self.client.get('/api/commits', follow=True)
