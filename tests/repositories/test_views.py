@@ -1,4 +1,6 @@
 import json
+from datetime import datetime, timedelta
+from typing import List
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
@@ -13,25 +15,20 @@ class TestCommitsView(TestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(username='test_user', password='test')
         self.repository = Repository.objects.create(name='Test Repository')
-        self.commits = [
+        self.commits = self.create_random_commits(number_commits=20, repository=self.repository)
+
+    @staticmethod
+    def create_random_commits(number_commits: int, repository: Repository) -> List[Commit]:
+        return [
             Commit.objects.create(
-                message='Commit 1',
-                sha='123456',
-                author='John Doe',
-                url='https://github.com/user/repo/commits/123456',
-                date='2023-05-01T10:00:00Z',
-                avatar='https://example.com/avatar.jpg',
-                repository=self.repository
-            ),
-            Commit.objects.create(
-                message='Commit 2',
-                sha='789012',
-                author='Jane Smith',
-                url='https://github.com/user/repo/commits/789012',
-                date='2023-05-02T11:00:00Z',
-                avatar='https://example.com/avatar.jpg',
-                repository=self.repository
-            )
+                message=f'Commit {i}',
+                sha=f'12345{i}',
+                author=f'Jane Smith {i}',
+                url=f'https://github.com/user/repo/commits/12345{i}',
+                date=datetime.now() + timedelta(days=i),
+                avatar=f'https://example.com/avatar{i}.jpg',
+                repository=repository
+            ) for i in range(number_commits)
         ]
 
     def test_commits_list_unauthenticated(self):
@@ -45,11 +42,52 @@ class TestCommitsView(TestCase):
         self.client.force_login(self.user)
         response = self.client.get('/api/commits', follow=True)
 
-        commits = Commit.objects.all()
+        commits = Commit.objects.all()[:10]
         serializer = CommitSerializer(commits, many=True)
 
+        response_commits = response.data["results"]
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, serializer.data)
+        self.assertListEqual(response_commits, serializer.data)
+        self.assertEqual(response.data["count"], 20)
+        self.assertIsNotNone(response.data["next"])
+        self.assertIsNone(response.data["previous"])
+
+    def test_commits_list_pagination(self):
+        """Check if the requested commits are returned with pagination."""
+        # Check first page
+        self.client.force_login(self.user)
+        response = self.client.get('/api/commits', follow=True)
+
+        all_commits = Commit.objects.all()
+        first_10_commits = all_commits[:10]
+        serializer = CommitSerializer(first_10_commits, many=True)
+
+        response_commits = response.data["results"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response_commits, serializer.data)
+        self.assertEqual(response.data["count"], 20)
+
+        # Should have a next page, but not a previous
+        self.assertIsNotNone(response.data["next"])
+        self.assertIsNone(response.data["previous"])
+
+        # Check second page
+        response = self.client.get('/api/commits?page=2', follow=True)
+
+        last_10_commits = all_commits[10:]
+        serializer = CommitSerializer(last_10_commits, many=True)
+
+        response_commits = response.data["results"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response_commits, serializer.data)
+        self.assertEqual(response.data["count"], 20)
+
+        # Should have a prevous page, but not a next
+        self.assertIsNone(response.data["next"])
+        self.assertIsNotNone(response.data["previous"])
 
     def tearDown(self):
         for commit in self.commits:

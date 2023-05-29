@@ -1,6 +1,7 @@
 from github.GithubException import UnknownObjectException
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,13 +13,14 @@ from .serializers import CommitSerializer, RepositorySerializer
 from .tasks import get_last_30_days_repo_commits
 
 
-class CommitsView(GenericAPIView):
+class CommitsView(ListAPIView):
     """View for endpoints related to Commits."""
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
 
-    def get(self, request: Request) -> Response:
+    def get(self, request: Request, *args, **kwargs) -> Response:
         """List all commits.
 
         :param request: Request object.
@@ -26,10 +28,7 @@ class CommitsView(GenericAPIView):
         :return: Response object containing serialized data for all commits.
         :rtype: Response
         """
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-
-        return Response(serializer.data)
+        return self.list(request, *args, **kwargs)
 
 
 class RepositoriesView(GenericAPIView):
