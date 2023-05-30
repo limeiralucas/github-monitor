@@ -99,9 +99,6 @@ class TestCommitsView(TestCase):
 
         response_commits = response.data["results"]
 
-        print([c["repository"] for c in serializer.data])
-        print([c["repository"] for c in response_commits])
-
         self.assertEqual(len(response_commits), 2)
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.status_code, 200)
