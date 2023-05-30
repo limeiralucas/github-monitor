@@ -15,12 +15,21 @@ from .serializers import CommitSerializer, RepositorySerializer
 from .tasks import get_last_30_days_repo_commits
 
 
+class CustomPagination(PageNumberPagination):
+    """Custom pagination class to include total number of pages."""
+    def get_paginated_response(self, data):
+        response = super().get_paginated_response(data)
+        response.data["total_pages"] = self.page.paginator.num_pages
+
+        return response
+
+
 class CommitsView(ListAPIView):
     """View for endpoints related to Commits."""
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backs = (filters.DjangoFilterBackend,)
     filterset_class = CommitFilter
 
