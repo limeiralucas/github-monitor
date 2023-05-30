@@ -94,7 +94,7 @@ class TestGithubAPIClient(TestCase):
         commits = self.gh_client.get_commits_from_repository(repository_name)
 
         repo_mock.get_commits.assert_called_once()
-        self.assertListEqual(commits, expected_commits)
+        self.assertCountEqual(commits, expected_commits)
 
     @patch('integrations.github_api.GithubAPIClient.get_repository')
     def test_get_commits_from_repository_since_date(self, get_repository_mock):

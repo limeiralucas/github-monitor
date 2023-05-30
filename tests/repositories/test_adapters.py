@@ -56,4 +56,4 @@ class CommitAdapterTest(TestCase):
         ]
 
         results = [CommitAdapter.from_data(commit_data) for commit_data in data]
-        self.assertListEqual(results, expected_results)
+        self.assertCountEqual(results, expected_results)

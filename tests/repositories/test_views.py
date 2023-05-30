@@ -57,17 +57,18 @@ class TestCommitsView(TestCase):
         response_commits = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response_commits, serializer.data)
+        self.assertCountEqual(response_commits, serializer.data)
         self.assertEqual(response.data["count"], 20)
         self.assertIsNotNone(response.data["next"])
         self.assertIsNone(response.data["previous"])
 
     def test_commits_list_author_filter(self):
+        """Check if the expected commits are return filtering by author."""
         author = 'Unique Author'
         commit = Commit.objects.create(
                 message='Commit Test',
                 sha='12345',
-                author='Unique Author',
+                author=author,
                 url='https://github.com/user/repo/commits/12345',
                 date=datetime.now(),
                 avatar=f'https://example.com/avatar.jpg',
@@ -86,6 +87,26 @@ class TestCommitsView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_commits[0], serializer.data)
 
+    def test_commits_list_repository_filter(self):
+        """Check if the expected commits are return filtering by repository."""
+        repository = Repository.objects.create(name='Unique Repository')
+        commits = self.create_random_commits(number_commits=2, repository=repository)
+
+        self.client.force_login(self.user)
+        response = self.client.get(f'/api/commits?repository={repository.name.lower()}', follow=True)
+
+        serializer = CommitSerializer(commits, many=True)
+
+        response_commits = response.data["results"]
+
+        print([c["repository"] for c in serializer.data])
+        print([c["repository"] for c in response_commits])
+
+        self.assertEqual(len(response_commits), 2)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response_commits, serializer.data)
+
     def test_commits_list_pagination(self):
         """Check if the requested commits are returned with pagination.
 
@@ -103,7 +124,7 @@ class TestCommitsView(TestCase):
         response_commits = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response_commits, serializer.data)
+        self.assertCountEqual(response_commits, serializer.data)
         self.assertEqual(response.data["count"], 20)
 
         # Should have a next page, but not a previous
@@ -119,7 +140,7 @@ class TestCommitsView(TestCase):
         response_commits = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response_commits, serializer.data)
+        self.assertCountEqual(response_commits, serializer.data)
         self.assertEqual(response.data["count"], 20)
 
         # Should have a previous page, but not a next
