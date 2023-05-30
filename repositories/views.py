@@ -1,3 +1,4 @@
+from django_filters import rest_framework as filters
 from github.GithubException import UnknownObjectException
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 
 from integrations.github_api import GithubAPIClient
 
+from .filters import CommitFilter
 from .models import Commit, Repository
 from .serializers import CommitSerializer, RepositorySerializer
 from .tasks import get_last_30_days_repo_commits
@@ -17,8 +19,10 @@ class CommitsView(ListAPIView):
     """View for endpoints related to Commits."""
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
+    filter_backs = (filters.DjangoFilterBackend,)
+    filterset_class = CommitFilter
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         """List all commits.

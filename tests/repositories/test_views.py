@@ -62,6 +62,30 @@ class TestCommitsView(TestCase):
         self.assertIsNotNone(response.data["next"])
         self.assertIsNone(response.data["previous"])
 
+    def test_commits_list_author_filter(self):
+        author = 'Unique Author'
+        commit = Commit.objects.create(
+                message='Commit Test',
+                sha='12345',
+                author='Unique Author',
+                url='https://github.com/user/repo/commits/12345',
+                date=datetime.now(),
+                avatar=f'https://example.com/avatar.jpg',
+                repository=self.repository
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(f'/api/commits?author={author.lower()}', follow=True)
+
+        serializer = CommitSerializer(commit)
+
+        response_commits = response.data["results"]
+
+        self.assertEqual(len(response_commits), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_commits[0], serializer.data)
+
     def test_commits_list_pagination(self):
         """Check if the requested commits are returned with pagination.
 
@@ -98,7 +122,7 @@ class TestCommitsView(TestCase):
         self.assertListEqual(response_commits, serializer.data)
         self.assertEqual(response.data["count"], 20)
 
-        # Should have a prevous page, but not a next
+        # Should have a previous page, but not a next
         self.assertIsNone(response.data["next"])
         self.assertIsNotNone(response.data["previous"])
 
