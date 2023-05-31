@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
 
@@ -10,7 +10,7 @@ class CommitListContainer extends React.Component {
   }
 
   render() {
-    const {commits} = this.props;
+    const { commits } = this.props;
     return (
       <div>
         <CommitList commits={commits} />
@@ -20,10 +20,16 @@ class CommitListContainer extends React.Component {
 }
 
 CommitListContainer.propTypes = {
-  commits: PropTypes.arrayOf(PropTypes.object).isRequired,
+  commits: PropTypes.arrayOf(PropTypes.shape({
+    sha: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+    repository: PropTypes.string.isRequired,
+    avatar: PropTypes.string,
+  })).isRequired,
 };
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   commits: store.commitState.commits,
 });
 
