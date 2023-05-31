@@ -4,10 +4,10 @@ import { shallow } from 'enzyme';
 import PaginationNav from '..';
 
 describe('PaginationNav', () => {
-  function prepare(numberOfPages = 2) {
+  function prepare(numberOfPages = 2, currentPage = 1) {
     const totalPages = numberOfPages;
     const onPageChange = jest.fn();
-    const wrapper = shallow(<PaginationNav totalPages={totalPages} onPageChange={onPageChange} />)
+    const wrapper = shallow(<PaginationNav totalPages={totalPages} onPageChange={onPageChange} currentPage={currentPage} />)
 
     return { onPageChange, wrapper, totalPages }
   }
@@ -46,4 +46,14 @@ describe('PaginationNav', () => {
     pageButtons.at(1).find('.page-link').simulate('click');
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
+
+  it.each([1, 2, 3])('renders page button %s as active', (currentPage) => {
+    const { wrapper } = prepare(currentPage, currentPage);
+    const pageButtons = wrapper.find('.page-item .page-button').find('.page-link');
+
+    const activePageButton = pageButtons.at(currentPage - 1);
+
+    expect(activePageButton.text()).toBe(currentPage.toString());
+    expect(activePageButton.hasClass("active")).toBe(true);
+  })
 });
