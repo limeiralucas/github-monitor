@@ -36,17 +36,6 @@ describe('PaginationNav', () => {
     }
   });
 
-  it('calls onPageChange when a page button is clicked', () => {
-    const { wrapper, onPageChange } = prepare();
-    const pageButtons = wrapper.find('.page-item.page-number');
-
-    pageButtons.at(0).find('.page-link').simulate('click');
-    expect(onPageChange).toHaveBeenCalledWith(1);
-
-    pageButtons.at(1).find('.page-link').simulate('click');
-    expect(onPageChange).toHaveBeenCalledWith(2);
-  });
-
   it.each([1, 2, 3])('renders page button %s as active', (currentPage) => {
     const { wrapper } = prepare(currentPage, currentPage);
     const linkContainer = wrapper.find('.page-item.page-number.active').first();

@@ -1,13 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
-const PaginationNav = ({ currentPage, totalPages, onPageChange }) => {
+const PaginationNav = ({ currentPage, totalPages, searchParams }) => {
+  const getUrlWithParam = (paramName, value) => {
+    const updatedSearchParams = new URLSearchParams(searchParams);
+    updatedSearchParams.set(paramName, value);
+
+    return updatedSearchParams.toString();
+  };
+
   const pageItems = Array.from({ length: totalPages }).map(
     (_, index) => (
       <li className={`page-item page-number ${(index + 1) === currentPage && 'active'}`}>
-        <button type="button" className="page-link" onClick={() => onPageChange(index + 1)}>
-          {index + 1}
-        </button>
+        <Link to={`/?${getUrlWithParam('page', index + 1)}`} className="page-link">{index + 1}</Link>
       </li>
     ),
   );
@@ -32,7 +38,7 @@ const PaginationNav = ({ currentPage, totalPages, onPageChange }) => {
 PaginationNav.propTypes = {
   currentPage: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
+  searchParams: PropTypes.string.isRequired,
 };
 
 export default PaginationNav;

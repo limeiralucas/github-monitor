@@ -74,7 +74,7 @@ const validate = (values) => {
   const repoNameRegex = /^[\w-]+\/[\w-]+$/;
   const errors = {};
   if (!values.name || !repoNameRegex.test(values.name)) {
-    errors.name = `Repository name must match the format {user}/{repo-name}`;
+    errors.name = 'Repository name must match the format {user}/{repo-name}';
   }
   return errors;
 };
