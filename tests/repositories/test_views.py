@@ -129,6 +129,7 @@ class TestCommitsView(TestCase):
         self.assertIsNotNone(response.data["next"])
         self.assertIsNone(response.data["previous"])
         self.assertEqual(response.data["total_pages"], 2)
+        self.assertEqual(response.data["page"], 1)
 
         # Check second page
         response = self.client.get('/api/commits?page=2', follow=True)
@@ -146,6 +147,7 @@ class TestCommitsView(TestCase):
         self.assertIsNone(response.data["next"])
         self.assertIsNotNone(response.data["previous"])
         self.assertEqual(response.data["total_pages"], 2)
+        self.assertEqual(response.data["page"], 2)
 
     def tearDown(self):
         for commit in self.commits:
