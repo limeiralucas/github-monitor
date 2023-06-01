@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Link, BrowserRouter as Router, Route, Switch,
+  Link, BrowserRouter as Router, Route, Routes,
 } from 'react-router-dom';
 import CommitListContainer from './containers/CommitListContainer';
 import RepoCreateContainer from './containers/RepoCreateContainer';
@@ -22,9 +22,9 @@ export default (
       <div id="page-content-wrapper">
         <div className="container-fluid">
           <RepoCreateContainer />
-          <Switch>
-            <Route path="/" exact component={CommitListContainer} />
-          </Switch>
+          <Routes>
+            <Route path="/" exact element={<CommitListContainer />} />
+          </Routes>
         </div>
       </div>
 

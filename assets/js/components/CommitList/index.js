@@ -1,9 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const CommitList = (props) => {
   const { commits } = props;
+  const [searchParams] = useSearchParams();
+
+  const getUrlWithParam = (paramName, value) => {
+    const updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set(paramName, value);
+
+    return updatedSearchParams.toString();
+  };
 
   return (
     <div>
@@ -25,7 +33,7 @@ const CommitList = (props) => {
                       {commit.message}
                     </p>
                     <small className="text-muted">
-                      <Link to={`/?author=${commit.author}`}>
+                      <Link to={`/?${getUrlWithParam('author', commit.author)}`}>
                         {commit.author}
                       </Link>
                       {' '}
@@ -33,7 +41,7 @@ const CommitList = (props) => {
                       {' '}
                       on
                       {' '}
-                      <Link to={`/?repository=${commit.repository}`}>
+                      <Link to={`/?${getUrlWithParam('repository', commit.repository)}`}>
                         {commit.repository}
                       </Link>
                       {' '}
