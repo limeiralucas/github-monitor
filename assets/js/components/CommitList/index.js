@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const CommitList = (props) => {
   const { commits, searchParams } = props;
 
   const getUrlWithParam = (paramName, value) => {
-    const updatedSearchParams = new URLSearchParams(searchParams.toString());
+    const updatedSearchParams = new URLSearchParams(searchParams);
     updatedSearchParams.set(paramName, value);
-    updatedSearchParams.delete("page");
+    updatedSearchParams.delete('page');
 
     return updatedSearchParams.toString();
   };
