@@ -22,7 +22,11 @@ const CommitListContainer = ({ commits, totalPages, currentPage }) => {
   return (
     <div>
       <CommitList commits={commits} />
-      <PaginationNav totalPages={totalPages} currentPage={currentPage} searchParams={searchParams.toString()} />
+      <PaginationNav
+        totalPages={totalPages}
+        currentPage={currentPage}
+        searchParams={searchParams.toString()}
+      />
     </div>
   );
 };
