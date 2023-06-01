@@ -11,7 +11,7 @@ const CommitListContainer = ({ commits }) => {
   const searchParams = new URLSearchParams(location.search);
   const filters = {
     author: searchParams.get('author'),
-    repository: searchParams.get('repository')
+    repository: searchParams.get('repository'),
   };
 
   useEffect(() => {
