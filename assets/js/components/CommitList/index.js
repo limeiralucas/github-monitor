@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const CommitList = (props) => {
   const { commits } = props;
+
   return (
     <div>
       {commits.length !== 0 && (
@@ -23,7 +25,9 @@ const CommitList = (props) => {
                       {commit.message}
                     </p>
                     <small className="text-muted">
-                      {commit.author}
+                      <Link to={`/?author=${commit.author}`}>
+                        {commit.author}
+                      </Link>
                       {' '}
                       authored
                       {' '}

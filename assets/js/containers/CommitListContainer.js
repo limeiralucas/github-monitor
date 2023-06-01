@@ -1,23 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
 
-class CommitListContainer extends React.Component {
-  componentDidMount() {
-    commitAPI.getCommits();
-  }
+const CommitListContainer = ({ commits }) => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const filters = {
+    author: searchParams.get('author'),
+  };
 
-  render() {
-    const { commits } = this.props;
-    return (
-      <div>
-        <CommitList commits={commits} />
-      </div>
-    );
-  }
-}
+  useEffect(() => {
+    commitAPI.getCommits(filters);
+  }, Object.values(filters));
+
+  return (
+    <div>
+      <CommitList commits={commits} />
+    </div>
+  );
+};
 
 CommitListContainer.propTypes = {
   commits: PropTypes.arrayOf(PropTypes.shape({
