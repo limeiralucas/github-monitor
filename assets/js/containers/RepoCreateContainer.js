@@ -7,9 +7,7 @@ import Form from '../components/RepoCreateForm';
 class RepoCreateContainer extends React.Component {
   submit = (values, dispatch) => {
     const token = document.getElementById('main').dataset.csrftoken;
-    const name = values.name.split('/')[1];
-    const v = { ...values, name };
-    return commitAPI.createRepository(v, { 'X-CSRFToken': token }, dispatch);
+    return commitAPI.createRepository(values, { 'X-CSRFToken': token }, dispatch);
   };
 
   render() {

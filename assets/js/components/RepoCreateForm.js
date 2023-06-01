@@ -71,10 +71,10 @@ RepoCreateForm.propTypes = {
 };
 
 const validate = (values) => {
-  const { username } = document.getElementById('main').dataset;
+  const repoNameRegex = /^[\w-]+\/[\w-]+$/;
   const errors = {};
-  if (!values.name || !values.name.startsWith(`${username}/`)) {
-    errors.name = `Repository must belong to you (eg: ${username}/repo-name)`;
+  if (!values.name || !repoNameRegex.test(values.name)) {
+    errors.name = `Repository name must match the format {user}/{repo-name}`;
   }
   return errors;
 };
