@@ -1,22 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { nanoid } from 'nanoid';
 
-const PaginationNav = ({ currentPage, totalPages, searchParams }) => {
+import PageItem from './PageItem';
+
+const PaginationNav = ({ currentPage, totalPages }) => {
   if (!totalPages || totalPages < 2) return null;
-
-  const getUrlWithParam = (paramName, value) => {
-    const updatedSearchParams = new URLSearchParams(searchParams);
-    updatedSearchParams.set(paramName, value);
-
-    return updatedSearchParams.toString();
-  };
 
   const pageItems = Array.from({ length: totalPages }).map(
     (_, index) => (
-      <li className={`page-item page-number ${(index + 1) === currentPage && 'active'}`}>
-        <Link to={`/?${getUrlWithParam('page', index + 1)}`} className="page-link">{index + 1}</Link>
-      </li>
+      <PageItem
+        active={(index + 1) === currentPage}
+        page={index + 1}
+        key={nanoid()}
+      />
     ),
   );
 
@@ -24,13 +21,9 @@ const PaginationNav = ({ currentPage, totalPages, searchParams }) => {
     <div className="d-flex justify-content-center">
       <nav aria-label="Page navigation">
         <ul className="pagination">
-          <li className="page-item">
-            <button type="button" className="page-link">Previous</button>
-          </li>
+          <PageItem page={currentPage - 1} text="Previous" disabled={currentPage === 1} />
           {pageItems}
-          <li className="page-item">
-            <button type="button" className="page-link">Next</button>
-          </li>
+          <PageItem page={currentPage + 1} text="Next" disabled={currentPage === totalPages} />
         </ul>
       </nav>
     </div>
@@ -40,7 +33,6 @@ const PaginationNav = ({ currentPage, totalPages, searchParams }) => {
 PaginationNav.propTypes = {
   currentPage: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
-  searchParams: PropTypes.string.isRequired,
 };
 
 export default PaginationNav;
