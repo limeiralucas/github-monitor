@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 const PaginationNav = ({ currentPage, totalPages, searchParams }) => {
+  if (!totalPages || totalPages < 2) return null;
+
   const getUrlWithParam = (paramName, value) => {
     const updatedSearchParams = new URLSearchParams(searchParams);
     updatedSearchParams.set(paramName, value);
