@@ -26,7 +26,7 @@ describe('PaginationNav', () => {
 
   it.each([0, 1, 2, 3])('renders %s page buttons', (numberOfPages) => {
     const { wrapper } = prepare(numberOfPages);
-    const pageButtons = wrapper.find('.page-item .page-button');
+    const pageButtons = wrapper.find('.page-item.page-number');
     expect(pageButtons).toHaveLength(numberOfPages);
 
     for (const i of Array(numberOfPages).keys()) {
@@ -38,7 +38,7 @@ describe('PaginationNav', () => {
 
   it('calls onPageChange when a page button is clicked', () => {
     const { wrapper, onPageChange } = prepare();
-    const pageButtons = wrapper.find('.page-item .page-button');
+    const pageButtons = wrapper.find('.page-item.page-number');
 
     pageButtons.at(0).find('.page-link').simulate('click');
     expect(onPageChange).toHaveBeenCalledWith(1);
@@ -49,11 +49,10 @@ describe('PaginationNav', () => {
 
   it.each([1, 2, 3])('renders page button %s as active', (currentPage) => {
     const { wrapper } = prepare(currentPage, currentPage);
-    const pageButtons = wrapper.find('.page-item .page-button').find('.page-link');
+    const linkContainer = wrapper.find('.page-item.page-number.active').first();
 
-    const activePageButton = pageButtons.at(currentPage - 1);
+    const activePageLink = linkContainer.find('.page-link').first();
 
-    expect(activePageButton.text()).toBe(currentPage.toString());
-    expect(activePageButton.hasClass("active")).toBe(true);
+    expect(activePageLink.text()).toBe(currentPage.toString());
   })
 });

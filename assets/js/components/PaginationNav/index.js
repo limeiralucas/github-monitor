@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 const PaginationNav = ({ currentPage, totalPages, onPageChange }) => {
   const pageItems = Array.from({ length: totalPages }).map(
     (_, index) => (
-      <li className="page-item">
-        <button type="button" className={`page-link page-button ${(index + 1) === currentPage && 'active'}`} onClick={() => onPageChange(index + 1)}>
+      <li className={`page-item page-number ${(index + 1) === currentPage && 'active'}`}>
+        <button type="button" className="page-link" onClick={() => onPageChange(index + 1)}>
           {index + 1}
         </button>
       </li>
