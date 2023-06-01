@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const CommitList = (props) => {
-  const { commits } = props;
-  const [searchParams] = useSearchParams();
+  const { commits, searchParams } = props;
 
   const getUrlWithParam = (paramName, value) => {
     const updatedSearchParams = new URLSearchParams(searchParams.toString());
     updatedSearchParams.set(paramName, value);
+    updatedSearchParams.delete("page");
 
     return updatedSearchParams.toString();
   };
@@ -63,6 +63,7 @@ const CommitList = (props) => {
 
 CommitList.propTypes = {
   commits: PropTypes.arrayOf(PropTypes.object).isRequired,
+  searchParams: PropTypes.string.isRequired,
 };
 
 export default CommitList;

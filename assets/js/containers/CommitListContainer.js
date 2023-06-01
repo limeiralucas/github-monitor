@@ -9,6 +9,7 @@ import PaginationNav from '../components/PaginationNav';
 
 const CommitListContainer = ({ commits, totalPages, currentPage }) => {
   const [searchParams] = useSearchParams();
+  const searchParamsString = searchParams.toString();
   const filters = {
     author: searchParams.get('author'),
     repository: searchParams.get('repository'),
@@ -21,11 +22,11 @@ const CommitListContainer = ({ commits, totalPages, currentPage }) => {
 
   return (
     <div>
-      <CommitList commits={commits} />
+      <CommitList commits={commits} searchParams={searchParamsString} />
       <PaginationNav
         totalPages={totalPages}
         currentPage={currentPage}
-        searchParams={searchParams.toString()}
+        searchParams={searchParamsString}
       />
     </div>
   );
