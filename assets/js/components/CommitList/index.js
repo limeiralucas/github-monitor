@@ -33,7 +33,9 @@ const CommitList = (props) => {
                       {' '}
                       on
                       {' '}
-                      {commit.repository}
+                      <Link to={`/?repository=${commit.repository}`}>
+                        {commit.repository}
+                      </Link>
                       {' '}
                       at
                       {' '}
