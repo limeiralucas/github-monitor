@@ -1,3 +1,5 @@
+![Backend](https://github.com/limeiralucas/github-monitor/actions/workflows/tests_python.yml/badge.svg)
+![Frontend](https://github.com/limeiralucas/github-monitor/actions/workflows/tests_js.yml/badge.svg)
 # github-monitor
 
 Github commits monitor
