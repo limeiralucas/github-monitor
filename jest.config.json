@@ -1,3 +1,4 @@
 {
-    "setupFiles": ["<rootDir>/setupTests.js"]
+    "setupFiles": ["<rootDir>/setupTests.js"],
+    "testEnvironment": "jsdom"
 }
