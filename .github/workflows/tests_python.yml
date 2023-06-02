@@ -5,6 +5,16 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: 'fake-secret'
+      DATABASE_URL: postgres://db_user:db_pwd@db:5432/db_name
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_pwd
+      POSTGRES_DB: db_name
+      BROKER_URL: redis://redis:6379/0
+      RESULT_URL: redis://redis:6379/1
+      SOCIAL_AUTH_GITHUB_KEY: ---
+      SOCIAL_AUTH_GITHUB_SECRET: ---
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
