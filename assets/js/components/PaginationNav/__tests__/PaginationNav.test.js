@@ -2,46 +2,78 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import PaginationNav from '..';
+import PageItem from '../PageItem';
 
-describe.skip('PaginationNav', () => {
-  function prepare(numberOfPages = 2, currentPage = 1) {
-    const totalPages = numberOfPages;
-    const onPageChange = jest.fn();
-    const wrapper = shallow(<PaginationNav totalPages={totalPages} onPageChange={onPageChange} currentPage={currentPage} />)
+describe('PaginationNav', () => {
+  it.each([
+    [2],
+    [3],
+    [4],
+  ])('renders %s page items', (totalPages) => {
+    const wrapper = shallow(<PaginationNav currentPage={1} totalPages={totalPages} />);
+    const pageItems = wrapper.find(PageItem).slice(1, totalPages + 1);
 
-    return { onPageChange, wrapper, totalPages }
-  }
+    expect(pageItems).toHaveLength(totalPages);
 
-  it('renders previous as first button', () => {
-    const { wrapper } = prepare()
-    const previousButton = wrapper.find('.page-item').first().find('.page-link');
-    expect(previousButton.text()).toBe('Previous');
+    pageItems.forEach((pageItem, index) => {
+      const expectedPage = index + 1;
+
+      expect(pageItem.prop('page')).toBe(expectedPage);
+    });
   });
 
-  it('renders next as last button', () => {
-    const { wrapper } = prepare();
-    const nextButton = wrapper.find('.page-item').last().find('.page-link');
-    expect(nextButton.text()).toBe('Next');
+  it.each([
+    [1],
+    [2],
+    [3],
+  ])('renders page item as active for current page %s', (currentPage) => {
+    const totalPages = 10;
+    const wrapper = shallow(<PaginationNav currentPage={currentPage} totalPages={totalPages} />);
+    const pageItems = wrapper.find(PageItem).slice(1, totalPages + 1);
+    const activePageItem = pageItems.at(currentPage - 1);
+
+    expect(activePageItem.prop('active')).toBe(true);
+    expect(activePageItem.prop('page')).toBe(currentPage);
   });
 
-  it.each([0, 1, 2, 3])('renders %s page buttons', (numberOfPages) => {
-    const { wrapper } = prepare(numberOfPages);
-    const pageButtons = wrapper.find('.page-item.page-number');
-    expect(pageButtons).toHaveLength(numberOfPages);
+  it('renders next and previous buttons as first and last ones', () => {
+    const totalPages = 5;
+    const currentPage = 2;
 
-    for (const i of Array(numberOfPages).keys()) {
-      const page = (i + 1).toString();
-      expect(pageButtons.at(i).find('.page-link').text()).toBe(page);
-      expect(pageButtons.at(i).find('.page-link').text()).toBe(page);
-    }
+    const wrapper = shallow(<PaginationNav currentPage={currentPage} totalPages={totalPages} />);
+    const pageItems = wrapper.find(PageItem);
+
+    const previous = pageItems.first();
+    const next = pageItems.last();
+
+    expect(previous.props()).toMatchObject({
+      page: currentPage - 1,
+      text: "Previous",
+    });
+    expect(next.props()).toMatchObject({
+      page: currentPage + 1,
+      text: "Next",
+    })
   });
 
-  it.each([1, 2, 3])('renders page button %s as active', (currentPage) => {
-    const { wrapper } = prepare(currentPage, currentPage);
-    const linkContainer = wrapper.find('.page-item.page-number.active').first();
+  it('does not render the component if totalPages is less than 2', () => {
+    const wrapper = shallow(<PaginationNav currentPage={1} totalPages={1} />);
+    const paginationNav = wrapper.find('.pagination');
 
-    const activePageLink = linkContainer.find('.page-link').first();
+    expect(paginationNav.exists()).toBe(false);
+  });
 
-    expect(activePageLink.text()).toBe(currentPage.toString());
-  })
+  it('disables previous button when currentPage is 1', () => {
+    const wrapper = shallow(<PaginationNav currentPage={1} totalPages={5} />);
+    const previousButton = wrapper.find(PageItem).at(0);
+
+    expect(previousButton.prop('disabled')).toBe(true);
+  });
+
+  it('disables next button when currentPage is the last page', () => {
+    const wrapper = shallow(<PaginationNav currentPage={5} totalPages={5} />);
+    const nextButton = wrapper.find(PageItem).at(6);
+
+    expect(nextButton.prop('disabled')).toBe(true);
+  });
 });
